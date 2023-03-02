@@ -1,26 +1,42 @@
-mod main_window;
+use gtk4::{Application, ApplicationWindow, Button};
+use gtk4::prelude::{ApplicationExt, ApplicationExtManual, ButtonExt, GtkWindowExt};
 
-use main_window::MainWindow;
+const APP_ID: &str = "org.gtk_rs.HelloWorld2";
 
-use gtk4::{
-    gio::resources_register_include,
-    prelude::{ApplicationExt, ApplicationExtManual},
-    traits::WidgetExt,
-};
-use libadwaita::Application;
+fn main() -> glib::ExitCode {
+    // Create a new application
+    let app = Application::builder().application_id(APP_ID).build();
 
-fn build_ui(application: &Application) {
-    let window = MainWindow::new(application);
-    window.show();
+    // Connect to "activate" signal of `app`
+    app.connect_activate(build_ui);
+
+    // Run the application
+    app.run()
 }
 
-pub fn main() {
-    resources_register_include!("gtk-rss-reader.gresource").expect("Failed to register resources.");
-
-    let application = Application::builder()
-        .application_id("com.example.gtk-rss-reader")
+fn build_ui(app: &Application) {
+    // Create a button with label and margins
+    let button = Button::builder()
+        .label("Press me!")
+        .margin_top(12)
+        .margin_bottom(12)
+        .margin_start(12)
+        .margin_end(12)
         .build();
 
-    application.connect_activate(build_ui);
-    application.run();
+    // Connect to "clicked" signal of `button`
+    button.connect_clicked(|button| {
+        // Set the label to "Hello World!" after the button has been clicked on
+        button.set_label("Hello World!");
+    });
+
+    // Create a window
+    let window = ApplicationWindow::builder()
+        .application(app)
+        .title("My GTK App")
+        .child(&button)
+        .build();
+
+    // Present window
+    window.present();
 }
